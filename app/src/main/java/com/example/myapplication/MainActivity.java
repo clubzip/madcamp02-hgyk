@@ -36,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -71,7 +72,22 @@ public class MainActivity extends AppCompatActivity {
                     //URL url = new URL("http://192.168.25.16:3000/users");
                     URL url = new URL(urls[0]);//url을 가져온다.
                     con = (HttpURLConnection) url.openConnection();
+//                    con.setRequestMethod("POST");
+                    con.setRequestMethod("PUT");
+                    con.setDoOutput(true); //GET일 때 비활성화
+                    con.setDoInput(true);
+                    con.setRequestProperty("Content-Type","application/json; charset=UTF-8"); // POST, PUT일때 활성화
+//                    String json = "{\"facebookID\": \"test\",\"contactList\": [{\"name\": \"test1\",\"phone_num\": \"11111111\"}]}"; - POST body
+//                    String json = "{\"name\": \"test\",\"dial\": \"010-1551-4541\"}"; - PUT add body
+                    String json = "{\"name\": \"test\"}";
+                    OutputStream os = con.getOutputStream();
+                    os.write(json.getBytes("UTF-8"));
+                    os.close();
+
                     con.connect();//연결 수행
+                    /*if(con.getResponseCode() == 404) {
+
+                    }*/
 
                     //입력 스트림 생성
                     InputStream stream = con.getInputStream();
