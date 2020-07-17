@@ -1,0 +1,284 @@
+package com.example.myapplication;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+import com.google.android.material.tabs.TabLayout;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.Console;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+
+    private TextView info;
+    private ImageView profile_image;
+    private LoginButton login;
+    private ViewPager viewPager;
+    private ViewPagerAdapter viewPagerAdapter;
+    private Toolbar toolbar;
+    private TabLayout tabLayout;
+    CallbackManager callbackManager;
+
+    private GalleryFrag galleryFrag;
+    private ContactFrag contactFrag;
+    private String UserID;
+    private String DataFromServer;
+
+    public class JSONTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                HttpURLConnection con = null;
+                BufferedReader reader = null;
+
+                try{
+                    //URL url = new URL("http://192.168.25.16:3000/users");
+                    URL url = new URL(urls[0]);//url을 가져온다.
+                    con = (HttpURLConnection) url.openConnection();
+                    con.connect();//연결 수행
+
+                    //입력 스트림 생성
+                    InputStream stream = con.getInputStream();
+
+                    //속도를 향상시키고 부하를 줄이기 위한 버퍼를 선언한다.
+                    reader = new BufferedReader(new InputStreamReader(stream));
+
+                    //실제 데이터를 받는곳
+                    StringBuffer buffer = new StringBuffer();
+
+                    //line별 스트링을 받기 위한 temp 변수
+                    String line = "";
+
+                    //아래라인은 실제 reader에서 데이터를 가져오는 부분이다. 즉 node.js서버로부터 데이터를 가져온다.
+                    while((line = reader.readLine()) != null){
+                        buffer.append(line);
+                    }
+
+                    //다 가져오면 String 형변환을 수행한다. 이유는 protected String doInBackground(String... urls) 니까
+                    return buffer.toString();
+
+                    //아래는 예외처리 부분이다.
+                } catch (MalformedURLException e){
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    //종료가 되면 disconnect메소드를 호출한다.
+                    if(con != null){
+                        con.disconnect();
+                    }
+                    try {
+                        //버퍼를 닫아준다.
+                        if(reader != null){
+                            reader.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }//finally 부분
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        //doInBackground메소드가 끝나면 여기로 와서 텍스트뷰의 값을 바꿔준다.
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            /*json_contact = result;
+            tvData.setText(result);*/
+            Log.i("JSON",result);
+            DataFromServer = result;
+            //캐시에 저장
+            File storage = getCacheDir();
+            File tempFile = new File(storage,"contact.json");
+            try {
+                tempFile.createNewFile();
+                FileOutputStream out = new FileOutputStream(tempFile);
+                out.write(result.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.login);
+        //setContent view를 login으로
+
+        info = findViewById(R.id.info);
+        profile_image = findViewById(R.id.profile);
+        login = findViewById(R.id.login_button);
+
+        login.setReadPermissions(Arrays.asList(
+                "public_profile", "email", "user_birthday", "user_friends"));
+
+        callbackManager = CallbackManager.Factory.create();
+
+        //로그인 상태라면 바로 setContentView(R.layout.activity_main);
+
+
+        login.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(final LoginResult loginResult) {
+                // App code
+                GraphRequest request = GraphRequest.newMeRequest(
+                        loginResult.getAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                // Application code
+                                try {
+                                    //Server에게 userID를 통해 요청
+                                    UserID = loginResult.getAccessToken().getUserId();
+                                    //Server로부터 해당 데이터열 받아와서 캐시에 저장 - 이는 JSONTask내부 onPostExecute에서 수행
+                                    new JSONTask().execute("http://192.249.19.244:2980/api/books/"+UserID);
+
+                                    setContentView(R.layout.activity_main);
+
+                                    //splash 부분
+                                    /*Intent intent0 = new Intent(this, SplashActivity.class);
+                                    startActivity(intent0);*/
+
+                                    viewPager = findViewById(R.id.view_pager);
+                                    tabLayout = findViewById(R.id.tap_layout);
+
+                                    galleryFrag = new GalleryFrag();
+                                    contactFrag = new ContactFrag();
+
+
+                                    tabLayout.setupWithViewPager(viewPager);
+
+                                    viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), 0);
+
+                                    viewPagerAdapter.addFragment(galleryFrag, "Gallery");
+                                    viewPagerAdapter.addFragment(contactFrag, "Contact");
+
+                                    viewPager.setAdapter(viewPagerAdapter);
+
+                                    tabLayout.getTabAt(0).setIcon(R.drawable.ic_baseline_collections_24);
+                                    tabLayout.getTabAt(1).setIcon(R.drawable.ic_baseline_contact_phone_24);
+
+
+
+
+
+
+                                    /*//contact.json파일이 존재하지 않으면
+                                    File contact = new File(getFilesDir(), "contact.json");
+                                    //        contact.delete();
+                                    if(!contact.exists()){
+                                        try {
+                                            contact.createNewFile();
+                                            FileOutputStream fos = openFileOutput("contact.json",MODE_APPEND);
+                                            fos.write("[\n]".getBytes());
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }*/
+
+                                    String name = object.getString("name");
+                                    info.setText(name);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,email,gender,birthday");
+                request.setParameters(parameters);
+                request.executeAsync();
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private class ViewPagerAdapter extends FragmentPagerAdapter {
+
+        private List<Fragment> fragments = new ArrayList<>();
+        private List<String> fragmentTitle = new ArrayList<>();
+
+        public ViewPagerAdapter(@NonNull FragmentManager fm, int behavior) {
+            super(fm, behavior);
+        }
+
+        public void addFragment(Fragment fragment, String title){
+            fragments.add(fragment);
+            fragmentTitle.add(title);
+        }
+
+
+        @NonNull
+        @Override
+        public Fragment getItem(int position) {
+            return fragments.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return fragments.size();
+        }
+
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return fragmentTitle.get(position);
+        }
+    }
+}
