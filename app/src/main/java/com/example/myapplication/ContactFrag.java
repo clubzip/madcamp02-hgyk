@@ -23,15 +23,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class ContactFrag extends Fragment {
-/*
-    public ContactFrag() {
 
+    public ContactFrag(String userID) {
+        UserID = userID;
     }
 
 
@@ -39,6 +40,7 @@ public class ContactFrag extends Fragment {
     ListView listView;
     ListViewAdapter listViewAdapter;
     ArrayList<ListViewItem> data = new ArrayList<>();
+    String UserID;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
@@ -51,38 +53,23 @@ public class ContactFrag extends Fragment {
         }
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_contact, container, false);
+
+        view = inflater.inflate(R.layout.contact_main, container, false);
         listView =(ListView) view.findViewById(R.id.listView);
         data = new ArrayList<>();
         listViewAdapter = new ListViewAdapter();
-        EditText editTextFilter = (EditText)view.findViewById(R.id.editSearch) ;
-        editTextFilter.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable edit) {
-                String filterText = edit.toString() ;
-                ((ListViewAdapter)listView.getAdapter()).getFilter().filter(filterText) ;
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-        }) ;
 
         Context context = getContext();
         Resources res = context.getResources();
 
-
         //내부 저장소의 json 파일 읽기 위한 InputStream
         try {
-            FileInputStream fis = getActivity().openFileInput("contact.json");
+            //내부 저장소의 UserID(=facebookID) 폴더의 contact.json 파일을 가져옴
+            File file = new File(getActivity().getFilesDir()+UserID,"contact.json");
+            FileInputStream fis = new FileInputStream(file);
             InputStreamReader isr= new InputStreamReader(fis);
             BufferedReader reader= new BufferedReader(isr);
 
@@ -102,12 +89,12 @@ public class ContactFrag extends Fragment {
                 JSONObject jo = jsonArray.getJSONObject(i);
 
                 String name = jo.getString("name");
-                String mobile = jo.getString("mobile");
-                String profile = jo.getString("profile");
+                String dial = jo.getString("dial");
+//                String profile = jo.getString("profile"); 프로필 사진 없음
 //                int drawableResId = res.getIdentifier(profile, "drawable", context.getPackageName());
                 //어뎁터에 아이템 추가 및 data에 추가
 //                data.add(listViewAdapter.addItem(name, mobile,drawableResId));
-                data.add(listViewAdapter.addItem(name, mobile,profile));
+                data.add(listViewAdapter.addItem(name, dial));
             }
 
             //리스트뷰에 어뎁터 set
@@ -119,26 +106,30 @@ public class ContactFrag extends Fragment {
                 public void onItemClick(AdapterView parent, View v, int position,long id) {
                     Intent intent = new Intent(getActivity(), ItemClicked.class);
 //                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra("profile", data.get(position).getProfile());
+//                    intent.putExtra("profile", data.get(position).getProfile());
                     intent.putExtra("name", data.get(position).getName());
-                    intent.putExtra("number", data.get(position).getNumber());
+                    intent.putExtra("dial", data.get(position).getNumber());
+                    intent.putExtra("UserID", UserID);
 
                     startActivityForResult(intent,10001);
                 }
             });
-    } catch (IOException e) {e.printStackTrace();} catch (JSONException e) {e.printStackTrace();}
-    // Inflate the layout for this fragment
-    //버튼 뷰 추가
-    Button addButton = (Button)view.findViewById(R.id.add);
-    addButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            *//*Intent intent = new Intent(getActivity(), ContactAdd.class);
-            startActivity(intent);*//*
-            Intent intent = new Intent(getActivity(), ContactAdd.class);
-            startActivityForResult(intent, 10001);
-        }
-    });
-    // 버튼 클릭 시 ContactAdd액티비티 실행 - (해당 액티비티 manifest에 추가하기)
-    return view;
-}*/}
+        } catch (IOException e) {e.printStackTrace();} catch (JSONException e) {e.printStackTrace();}
+
+        //버튼 뷰 추가
+        Button addButton = (Button)view.findViewById(R.id.add);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            /*Intent intent = new Intent(getActivity(), ContactAdd.class);
+            startActivity(intent);*/
+                Intent intent = new Intent(getActivity(), ContactAdd.class);
+                intent.putExtra("UserID", UserID);
+                startActivityForResult(intent, 10001);
+            }
+        });
+        // 버튼 클릭 시 ContactAdd액티비티 실행 - (해당 액티비티 manifest에 추가하기)
+
+        return view;
+    }
+}

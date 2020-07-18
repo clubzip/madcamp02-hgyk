@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                                     tabLayout = findViewById(R.id.tap_layout);
 
                                     galleryFrag = new GalleryFrag();
-                                    contactFrag = new ContactFrag();
+                                    contactFrag = new ContactFrag(UserID);
 
 
                                     tabLayout.setupWithViewPager(viewPager);
@@ -222,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                                     /*//contact.json파일이 존재하지 않으면
+
                                     File contact = new File(getFilesDir(), "contact.json");
                                     //        contact.delete();
                                     if(!contact.exists()){
