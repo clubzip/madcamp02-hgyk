@@ -73,16 +73,16 @@ public class MainActivity extends AppCompatActivity {
                     URL url = new URL(urls[0]);//url을 가져온다.
                     con = (HttpURLConnection) url.openConnection();
 //                    con.setRequestMethod("POST");
-                    con.setRequestMethod("PUT");
-                    con.setDoOutput(true); //GET일 때 비활성화
+                    con.setRequestMethod("GET");
+//                    con.setDoOutput(true); //GET일 때 비활성화
                     con.setDoInput(true);
-                    con.setRequestProperty("Content-Type","application/json; charset=UTF-8"); // POST, PUT일때 활성화
+//                    con.setRequestProperty("Content-Type","application/json; charset=UTF-8"); // POST, PUT일때 활성화
 //                    String json = "{\"facebookID\": \"test\",\"contactList\": [{\"name\": \"test1\",\"phone_num\": \"11111111\"}]}"; - POST body
 //                    String json = "{\"name\": \"test\",\"dial\": \"010-1551-4541\"}"; - PUT add body
-                    String json = "{\"name\": \"test\"}";
+                    /*String json = "{\"name\": \"test\"}";
                     OutputStream os = con.getOutputStream();
                     os.write(json.getBytes("UTF-8"));
-                    os.close();
+                    os.close();*/
 
                     con.connect();//연결 수행
                     /*if(con.getResponseCode() == 404) {
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         UserID = intent.getStringExtra("userid");
 
         //Server로부터 해당 데이터열 받아와서 캐시에 저장 - 이는 JSONTask내부 onPostExecute에서 수행 -- 이건 mainactivity에서 수행
-        new MainActivity.JSONTask().execute("http://192.249.19.244:2980/api/contacts/delete/facebookID/" + UserID);
+        new MainActivity.JSONTask().execute("http://192.249.19.244:2980/api/contacts/facebookID/testFacebookID");
 
         //setContent view를 login으로
 
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = findViewById(R.id.tap_layout);
 
         galleryFrag = new GalleryFrag();
-        contactFrag = new ContactFrag(UserID);
+        contactFrag = new ContactFrag();//UserID 추가
 
 
         tabLayout.setupWithViewPager(viewPager);
