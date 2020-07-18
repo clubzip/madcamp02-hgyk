@@ -58,6 +58,12 @@ public class MainActivity extends AppCompatActivity {
 
     private String UserID;
     private String DataFromServer;
+    public boolean selectingImage = false;
+    public String startTimeID;
+
+    public boolean isSelection() {
+        return selectingImage;
+    }
 
 
 
@@ -69,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
                 BufferedReader reader = null;
 
                 try{
-                    //URL url = new URL("http://192.168.25.16:3000/users");
                     URL url = new URL(urls[0]);//url을 가져온다.
                     con = (HttpURLConnection) url.openConnection();
 //                    con.setRequestMethod("POST");
@@ -163,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
 //        FacebookSdk.sdkInitialize(this.getApplicationContext());
         setContentView(R.layout.activity_main);
 
-        galleryFrag = new GalleryFrag();
+        galleryFrag = new GalleryFrag(UserID);//UserID넣는 걸로 바꾸고 Frag안에서 네트워킹 구현
         contactFrag = new ContactFrag(UserID);
 
         Intent intent = getIntent();
@@ -172,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Server로부터 해당 데이터열 받아와서 캐시에 저장 - 이는 JSONTask내부 onPostExecute에서 수행 -- 이건 mainactivity에서 수행
         new MainActivity.JSONTask().execute("http://192.249.19.244:2980/api/contacts/facebookID/testFacebookID");
+        //DataFromServer가 존재하면 아무것도 안해도 됨. - 이후 ContactFrag에서 해당
 
         //setContent view를 login으로
 
