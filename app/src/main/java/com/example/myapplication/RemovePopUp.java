@@ -76,7 +76,7 @@ public class RemovePopUp extends Activity {
         fos.write(jsonData.getBytes());
         fos.close();
 
-        //////////////// DB에도 연락처 정보 삭제하기 /////////////////
+        // DB 연락처 정보 삭제하기
         try {
             HttpURLConnection con = null;
             BufferedReader readerdb = null;
@@ -89,8 +89,6 @@ public class RemovePopUp extends Activity {
                 con.setDoOutput(true); //GET일 때 비활성화
                 con.setDoInput(true);
                 con.setRequestProperty("Content-Type","application/json; charset=UTF-8"); // POST, PUT일때 활성화
-//                    String json = "{\"facebookID\": \"test\",\"contactList\": [{\"name\": \"test1\",\"phone_num\": \"11111111\"}]}"; - POST body
-//                    String json = "{\"name\": \"test\",\"dial\": \"010-1551-4541\"}"; - PUT add body
                 String json = "{\"name\": \""+name+"\"}";
                 OutputStream os = con.getOutputStream();
                 os.write(json.getBytes("UTF-8"));

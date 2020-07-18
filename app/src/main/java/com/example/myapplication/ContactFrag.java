@@ -76,8 +76,17 @@ public class ContactFrag extends Fragment {
             StringBuffer buffer= new StringBuffer();
             String line= reader.readLine();
             while (line!=null){
+                while (!line.contains(UserID)){
+                    reader.readLine();
+                }
+                reader.readLine();
+                reader.readLine(); // read [
+                while (!line.contains("]")){
+                    buffer.append(line+"\n");
+                    line = reader.readLine();
+                }
                 buffer.append(line+"\n");
-                line=reader.readLine();
+                break;
             }
 
             String jsonData= buffer.toString();
@@ -90,10 +99,6 @@ public class ContactFrag extends Fragment {
 
                 String name = jo.getString("name");
                 String dial = jo.getString("dial");
-//                String profile = jo.getString("profile"); 프로필 사진 없음
-//                int drawableResId = res.getIdentifier(profile, "drawable", context.getPackageName());
-                //어뎁터에 아이템 추가 및 data에 추가
-//                data.add(listViewAdapter.addItem(name, mobile,drawableResId));
                 data.add(listViewAdapter.addItem(name, dial));
             }
 
