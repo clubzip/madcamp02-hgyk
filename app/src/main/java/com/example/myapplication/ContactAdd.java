@@ -49,7 +49,7 @@ public class ContactAdd extends AppCompatActivity {
     String nameStr;
     String dialStr;
 
-    public class JSONTask extends AsyncTask<String, String, String> {
+    public class JSONTaskADD extends AsyncTask<String, String, String> {
         @Override
         protected String doInBackground(String... urls) {
             try {
@@ -194,7 +194,7 @@ public class ContactAdd extends AppCompatActivity {
                     finish();
 
                     //DB에 정보 {name: "ex", dial: "ex"} 추가
-                    new ContactAdd.JSONTask().execute("http://192.249.19.244:2980/api/contacts/add/facebookID/" + UserID);
+                    new ContactAdd.JSONTaskADD().execute("http://192.249.19.244:2980/api/contacts/add/facebookID/" + UserID);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

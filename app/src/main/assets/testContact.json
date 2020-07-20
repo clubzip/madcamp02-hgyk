@@ -1,0 +1,16 @@
+[
+  {
+    "facebookID" : "testID",
+    "contactList" : [
+      {"name": "list1", "dial": "1111"},
+      {"name": "list2", "dial": "2222"}
+    ]
+  },
+  {
+    "facebookID" : "testID2",
+    "contactList" : [
+      {"name": "list3", "dial": "3333"},
+      {"name": "list4", "dial": "4444"}
+    ]
+  }
+]
