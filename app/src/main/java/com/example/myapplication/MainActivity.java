@@ -67,100 +67,100 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public class JSONTask extends AsyncTask<String, String, String> {
-        @Override
-        protected String doInBackground(String... urls) {
-            try {
-                HttpURLConnection con = null;
-                BufferedReader reader = null;
-
-                try{
-                    URL url = new URL(urls[0]);//url을 가져온다.
-                    con = (HttpURLConnection) url.openConnection();
-//                    con.setRequestMethod("POST");
-                    con.setRequestMethod("GET");
-//                    con.setDoOutput(true); //GET일 때 비활성화
-                    con.setDoInput(true);
-//                    con.setRequestProperty("Content-Type","application/json; charset=UTF-8"); // POST, PUT일때 활성화
-//                    String json = "{\"facebookID\": \"test\",\"contactList\": [{\"name\": \"test1\",\"phone_num\": \"11111111\"}]}"; - POST body
-//                    String json = "{\"name\": \"test\",\"dial\": \"010-1551-4541\"}"; - PUT add body
-                    /*String json = "{\"name\": \"test\"}";
-                    OutputStream os = con.getOutputStream();
-                    os.write(json.getBytes("UTF-8"));
-                    os.close();*/
-
-                    con.connect();//연결 수행
-                    /*if(con.getResponseCode() == 404) {
-
-                    }*/
-
-                    //입력 스트림 생성
-                    InputStream stream = con.getInputStream();
-
-                    //속도를 향상시키고 부하를 줄이기 위한 버퍼를 선언한다.
-                    reader = new BufferedReader(new InputStreamReader(stream));
-
-                    //실제 데이터를 받는곳
-                    StringBuffer buffer = new StringBuffer();
-
-                    //line별 스트링을 받기 위한 temp 변수
-                    String line = "";
-
-                    //아래라인은 실제 reader에서 데이터를 가져오는 부분이다. 즉 node.js서버로부터 데이터를 가져온다.
-                    while((line = reader.readLine()) != null){
-                        buffer.append(line);
-                    }
-
-                    //다 가져오면 String 형변환을 수행한다. 이유는 protected String doInBackground(String... urls) 니까
-                    return buffer.toString();
-
-                    //아래는 예외처리 부분이다.
-                } catch (MalformedURLException e){
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    //종료가 되면 disconnect메소드를 호출한다.
-                    if(con != null){
-                        con.disconnect();
-                    }
-                    try {
-                        //버퍼를 닫아준다.
-                        if(reader != null){
-                            reader.close();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }//finally 부분
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        //doInBackground메소드가 끝나면 여기로 와서 텍스트뷰의 값을 바꿔준다.
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            /*json_contact = result;
-            tvData.setText(result);*/
-//            Log.i("JSON",result);
-            DataFromServer = result;
-            //캐시에 저장
-            File storage = getCacheDir();
-            File tempFile = new File(storage,"contact.json");
-            try {
-                tempFile.createNewFile();
-                FileOutputStream out = new FileOutputStream(tempFile);
-                out.write(result.getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
+//    public class JSONTask extends AsyncTask<String, String, String> {
+//        @Override
+//        protected String doInBackground(String... urls) {
+//            try {
+//                HttpURLConnection con = null;
+//                BufferedReader reader = null;
+//
+//                try{
+//                    URL url = new URL(urls[0]);//url을 가져온다.
+//                    con = (HttpURLConnection) url.openConnection();
+////                    con.setRequestMethod("POST");
+//                    con.setRequestMethod("GET");
+////                    con.setDoOutput(true); //GET일 때 비활성화
+//                    con.setDoInput(true);
+////                    con.setRequestProperty("Content-Type","application/json; charset=UTF-8"); // POST, PUT일때 활성화
+////                    String json = "{\"facebookID\": \"test\",\"contactList\": [{\"name\": \"test1\",\"phone_num\": \"11111111\"}]}"; - POST body
+////                    String json = "{\"name\": \"test\",\"dial\": \"010-1551-4541\"}"; - PUT add body
+//                    /*String json = "{\"name\": \"test\"}";
+//                    OutputStream os = con.getOutputStream();
+//                    os.write(json.getBytes("UTF-8"));
+//                    os.close();*/
+//
+//                    con.connect();//연결 수행
+//                    /*if(con.getResponseCode() == 404) {
+//
+//                    }*/
+//
+//                    //입력 스트림 생성
+//                    InputStream stream = con.getInputStream();
+//
+//                    //속도를 향상시키고 부하를 줄이기 위한 버퍼를 선언한다.
+//                    reader = new BufferedReader(new InputStreamReader(stream));
+//
+//                    //실제 데이터를 받는곳
+//                    StringBuffer buffer = new StringBuffer();
+//
+//                    //line별 스트링을 받기 위한 temp 변수
+//                    String line = "";
+//
+//                    //아래라인은 실제 reader에서 데이터를 가져오는 부분이다. 즉 node.js서버로부터 데이터를 가져온다.
+//                    while((line = reader.readLine()) != null){
+//                        buffer.append(line);
+//                    }
+//
+//                    //다 가져오면 String 형변환을 수행한다. 이유는 protected String doInBackground(String... urls) 니까
+//                    return buffer.toString();
+//
+//                    //아래는 예외처리 부분이다.
+//                } catch (MalformedURLException e){
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } finally {
+//                    //종료가 되면 disconnect메소드를 호출한다.
+//                    if(con != null){
+//                        con.disconnect();
+//                    }
+//                    try {
+//                        //버퍼를 닫아준다.
+//                        if(reader != null){
+//                            reader.close();
+//                        }
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }//finally 부분
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//            return null;
+//        }
+//
+//        //doInBackground메소드가 끝나면 여기로 와서 텍스트뷰의 값을 바꿔준다.
+//        @Override
+//        protected void onPostExecute(String result) {
+//            super.onPostExecute(result);
+//            /*json_contact = result;
+//            tvData.setText(result);*/
+////            Log.i("JSON",result);
+//            DataFromServer = result;
+//            //캐시에 저장
+//            File storage = getCacheDir();
+//            File tempFile = new File(storage,"contact.json");
+//            try {
+//                tempFile.createNewFile();
+//                FileOutputStream out = new FileOutputStream(tempFile);
+//                out.write(result.getBytes());
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,15 +168,15 @@ public class MainActivity extends AppCompatActivity {
 //        FacebookSdk.sdkInitialize(this.getApplicationContext());
         setContentView(R.layout.activity_main);
 
-        galleryFrag = new GalleryFrag(UserID);//UserID넣는 걸로 바꾸고 Frag안에서 네트워킹 구현
-        contactFrag = new ContactFrag(UserID);
-
         Intent intent = getIntent();
         UserID = intent.getStringExtra("userid");
 
+        galleryFrag = new GalleryFrag(UserID);//UserID넣는 걸로 바꾸고 Frag안에서 네트워킹 구현
+        contactFrag = new ContactFrag(UserID);
+
 
         //Server로부터 해당 데이터열 받아와서 캐시에 저장 - 이는 JSONTask내부 onPostExecute에서 수행 -- 이건 mainactivity에서 수행
-        new MainActivity.JSONTask().execute("http://192.249.19.244:2980/api/contacts/facebookID/testFacebookID");
+//        new MainActivity.JSONTask().execute("http://192.249.19.244:2980/api/contacts/facebookID/testFacebookID");
         //DataFromServer가 존재하면 아무것도 안해도 됨. - 이후 ContactFrag에서 해당
 
         //setContent view를 login으로
@@ -200,6 +200,8 @@ public class MainActivity extends AppCompatActivity {
 
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_baseline_collections_24);
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_baseline_contact_phone_24);
+
+
 
         /*//contact.json파일이 존재하지 않으면
         File contact = new File(getFilesDir(), "contact.json");

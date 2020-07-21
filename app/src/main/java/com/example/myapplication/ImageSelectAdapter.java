@@ -24,11 +24,13 @@ public class ImageSelectAdapter extends BaseAdapter {
     private Context mContext;
     private int mCellSize;
     private ArrayList<Image> mImageArrayList;
+    private String UserID;
     Bitmap circle;
     Bitmap check;
     SparseBooleanArray checked = new SparseBooleanArray();
 
-    public ImageSelectAdapter(Context c, int cellSize, ArrayList<Image> imageArrayList){
+    public ImageSelectAdapter(Context c, int cellSize, ArrayList<Image> imageArrayList, String userID){
+        UserID = userID;
         mContext = c;
         mCellSize = cellSize;
         mImageArrayList = imageArrayList;
@@ -105,10 +107,12 @@ public class ImageSelectAdapter extends BaseAdapter {
     }
 
     public void deleteChecked() {
+        ArrayList<String> removedFilenameList = new ArrayList<>();
         ArrayList<Image> removeList = new ArrayList<>();
         for (int i = 0; i < mImageArrayList.size(); i++) {
             if (checked.get(i)) {
-                File fdelete = new File(mImageArrayList.get(i).getAbsolutePath());
+                String path = mImageArrayList.get(i).getAbsolutePath();
+                File fdelete = new File(path);
                 fdelete.delete();
 
                 Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
@@ -117,9 +121,15 @@ public class ImageSelectAdapter extends BaseAdapter {
                 mContext.sendBroadcast(mediaScanIntent);
 
                 removeList.add(mImageArrayList.get(i));
+                removedFilenameList.add(path.substring(path.lastIndexOf("/")+1));
             }
         }
         mImageArrayList.removeAll(removeList);
+
+        //Call DeleteThread which request to delete the File name list from DB and Files in Directory
+        DeleteThread dthread = new DeleteThread("http://192.249.19.244:2980/api/images/delete/facebookID/"+UserID, removedFilenameList);
+        dthread.start();
+
     }
 
     public void getChecked() {
