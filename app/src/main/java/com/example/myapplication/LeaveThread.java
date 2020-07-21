@@ -24,32 +24,35 @@ class LeaveThread extends Thread {
 
     @Override
     public void run() {
-        URL imgurl;
-        int Read;
-        try {
-            imgurl = new URL(ServerUrl);
-            HttpURLConnection conn = (HttpURLConnection) imgurl.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
-            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        synchronized (this) {
+            URL imgurl;
+            int Read;
+            try {
+                imgurl = new URL(ServerUrl);
+                HttpURLConnection conn = (HttpURLConnection) imgurl.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
 
-            String json = "{ \"date\": \"" + Today + "\", \"leave\": \"" + Time + "\"}";
+                String json = "{ \"date\": \"" + Today + "\", \"leave\": \"" + Time + "\"}";
 
-            OutputStream os = conn.getOutputStream();
-            os.write(json.getBytes("UTF-8"));
-            os.close();
+                OutputStream os = conn.getOutputStream();
+                os.write(json.getBytes("UTF-8"));
+                os.close();
 
-            conn.connect();
+                conn.connect();
+                notify();
 
-            InputStream is = conn.getInputStream();
+                InputStream is = conn.getInputStream();
 
-        } catch (MalformedURLException e) {
-            Log.e("ERROR1", e.getMessage());
-        } catch (IOException e) {
-            Log.e("ERROR2", e.getMessage());
-            e.printStackTrace();
+            } catch (MalformedURLException e) {
+                Log.e("ERROR1", e.getMessage());
+            } catch (IOException e) {
+                Log.e("ERROR2", e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 }

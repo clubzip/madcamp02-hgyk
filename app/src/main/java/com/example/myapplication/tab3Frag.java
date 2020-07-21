@@ -70,6 +70,7 @@ public class tab3Frag extends Fragment {
     TextView starttime;
     TextView endtime;
     TextView nobody;
+    TextView nobody_leave;
     TextView worktime;
     private tab3Frag mFragment = this;
 
@@ -104,6 +105,7 @@ public class tab3Frag extends Fragment {
         endtime = (TextView) view.findViewById(R.id.Text_leaveTime);
         worktime = (TextView) view.findViewById(R.id.Text_Time);
         nobody = (TextView) view.findViewById(R.id.nobody);
+        nobody_leave = (TextView) view.findViewById(R.id.nobody_leave);
 
 
         datetoday.setText(sdftoday_screen.format(date));
@@ -184,15 +186,17 @@ public class tab3Frag extends Fragment {
         if(waitTime == "failToGetRANK"){
             Log.d("JSONTaskRank", "failToGetRANK");
         } else if (waitTime == "NoDATA"){
+            nobody_leave.setVisibility(View.VISIBLE);
             // visibility
         } else {
+            nobody_leave.setVisibility(View.INVISIBLE);
             JSONArray jsonArray = null;
             try {
                 jsonArray = new JSONArray(waitTime);
                 // sort jsonArray
                 List<JSONObject> jsonObjectList = new ArrayList<JSONObject>();
                 for (int i = 0; i < jsonArray.length(); i++){
-                    if (jsonArray.getJSONObject((i)).get("end") != null) {
+                    if (jsonArray.getJSONObject((i)).has("end")) {
                         jsonObjectList.add(jsonArray.getJSONObject(i));
                     }
                 }
@@ -228,7 +232,7 @@ public class tab3Frag extends Fragment {
 
                 JSONArray sortedJsonArray_TIME = new JSONArray();
 
-                for (int jsonI = 0; jsonI < jsonArray.length();jsonI++){
+                for (int jsonI = 0; jsonI < jsonObjectList_TIME.size();jsonI++){
                     sortedJsonArray_TIME.put(jsonObjectList_TIME.get(jsonI));
                 }
 
@@ -388,6 +392,15 @@ public class tab3Frag extends Fragment {
 
                         LeaveThread lThread = new LeaveThread("http://192.249.19.244:2980/api/leave/"+UserID, today,time);
                         lThread.start();
+                        synchronized (lThread){
+                            try {
+                                lThread.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.detach(mFragment).attach(mFragment).commit();
                     }
                 });
 
