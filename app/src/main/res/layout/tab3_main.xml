@@ -15,7 +15,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
-            android:text="오늘 날짜 :"
+            android:text="오늘 날짜 : "
+            android:textColor="#000000"
             android:textSize="20dp"/>
         <TextView
             android:id="@+id/dateOfToday"
@@ -37,7 +38,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="출근 시간: "
+            android:textColor="#000000"
+            android:text="출근 시간 : "
             android:textSize="20dp"/>
         <TextView
             android:id="@+id/Text_workTime"
@@ -58,7 +60,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="퇴근 시간: "
+            android:text="퇴근 시간 : "
+            android:textColor="#000000"
             android:textSize="20dp"/>
         <TextView
             android:id="@+id/Text_leaveTime"
@@ -80,7 +83,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="근무 시간: "
+            android:text="근무 시간 : "
+            android:textColor="#000000"
             android:textSize="20dp"/>
         <TextView
             android:id="@+id/Text_Time"
@@ -120,14 +124,24 @@
                 android:textSize="20dp"/>
         </LinearLayout>
 
-
-        <ListView
-            android:id="@+id/listView_workRank"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginHorizontal="10dp"
-            android:textFilterEnabled="true"
-            app:layout_constraintTop_toBottomOf="@id/hi"/>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ListView
+                android:id="@+id/listView_workRank"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginHorizontal="10dp"
+                android:textFilterEnabled="true" />
+            <TextView
+                android:id="@+id/nobody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="아직 아무도 출근 안했어요!"
+                android:layout_centerInParent="true"
+                android:textSize="25dp"
+                android:visibility="invisible"/>
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/bye"
@@ -170,14 +184,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="com.example.madwin.listviewexample1.MainActivity"
         tools:showIn="@layout/activity_main">
-        <TextView
-            android:id="@+id/nobody"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="아직 아무도 출근 안했어요!"
-            android:layout_centerInParent="true"
-            android:textSize="25dp"
-            android:visibility="invisible"/>
+
 
 
         <LinearLayout

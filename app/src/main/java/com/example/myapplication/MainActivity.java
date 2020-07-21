@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
         viewPagerAdapter.addFragment(galleryFrag, "Gallery");
         viewPagerAdapter.addFragment(contactFrag, "Contact");
-        viewPagerAdapter.addFragment(tab3Frag, "tab3");
+        viewPagerAdapter.addFragment(tab3Frag, "Work");
 
         viewPager.setAdapter(viewPagerAdapter);
 

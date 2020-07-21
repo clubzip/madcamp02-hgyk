@@ -67,6 +67,7 @@ public class tab3Frag extends Fragment {
     TextView starttime;
     TextView endtime;
     TextView nobody;
+    TextView worktime;
     private tab3Frag mFragment = this;
 
 
@@ -95,6 +96,7 @@ public class tab3Frag extends Fragment {
         datetoday = (TextView) view.findViewById(R.id.dateOfToday);
         starttime = (TextView) view.findViewById(R.id.Text_workTime);
         endtime = (TextView) view.findViewById(R.id.Text_leaveTime);
+        worktime = (TextView) view.findViewById(R.id.Text_Time);
         nobody = (TextView) view.findViewById(R.id.nobody);
 
 
@@ -200,9 +202,21 @@ public class tab3Frag extends Fragment {
                     JSONObject jsonObject = jsonArray.getJSONObject(0);
                     String getStartTime = (String) jsonObject.get("start");
                     String getEndTime = (String) jsonObject.get("end");
+                    int start_time = Integer.parseInt(getStartTime.substring(0,2))*3600 +
+                                    Integer.parseInt(getStartTime.substring(2,4))*60 +
+                                    Integer.parseInt(getStartTime.substring(4));
+                    int end_time = Integer.parseInt(getEndTime.substring(0,2))*3600 +
+                            Integer.parseInt(getEndTime.substring(2,4))*60 +
+                            Integer.parseInt(getEndTime.substring(4));
+                    int time = end_time - start_time;
+                    String timestr = Integer.toString(time/3600)+"시간 "
+                                        +Integer.toString((time%3600)/60)+"분 "
+                                        +Integer.toString((time%3600)%60)+"초";
 
                     starttime.setText(getStartTime.substring(0,2)+"시 "+getStartTime.substring(2,4)+"분 "+getStartTime.substring(4)+"초");
                     endtime.setText(getEndTime.substring(0,2)+"시 "+getEndTime.substring(2,4)+"분 "+getEndTime.substring(4)+"초");
+                    worktime.setText(timestr);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -263,6 +277,10 @@ public class tab3Frag extends Fragment {
         stampLeave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+                if(starttime.getText().equals("아직 출근 전이에요!!")){
+                    Toast.makeText(getApplicationContext(), "아직 출근도 안하셨는데..?", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if(!endtime.getText().equals("아직 퇴근 전이에요ㅜㅜ")){
                     Toast.makeText(getApplicationContext(), "이미 퇴근하셨네요!", Toast.LENGTH_SHORT).show();
                     return;
