@@ -24,6 +24,7 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.material.tabs.TabLayout;
@@ -168,17 +169,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        FacebookSdk.sdkInitialize(this.getApplicationContext());
         setContentView(R.layout.activity_main);
 
         Intent intent = getIntent();
 
+
         UserID = intent.getStringExtra("userid");
-        UserName = intent.getStringExtra("username");
 
         galleryFrag = new GalleryFrag(UserID);//UserID넣는 걸로 바꾸고 Frag안에서 네트워킹 구현
         contactFrag = new ContactFrag(UserID);
-        tab3Frag = new tab3Frag(UserID,UserName);
+        tab3Frag = new tab3Frag(UserID, UserName);
 
         //UserID = "TESTID76";
 

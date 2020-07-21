@@ -32,8 +32,7 @@ public class LoginActivity  extends AppCompatActivity {
 
     private void updateWithToken(AccessToken currentAccessToken) {
 
-        if (currentAccessToken != null) {
-
+        if (currentAccessToken != null && Profile.getCurrentProfile() != null) {
             UserID = currentAccessToken.getUserId();
             Profile profile = Profile.getCurrentProfile();
             UserName = profile.getName();
@@ -51,8 +50,7 @@ public class LoginActivity  extends AppCompatActivity {
         setContentView(R.layout.login);
         login = findViewById(R.id.login_button);
 
-        login.setPermissions(Arrays.asList(
-                "public_profile", "email", "user_birthday", "user_friends"));
+        login.setPermissions("public_profile");
 
         callbackManager = CallbackManager.Factory.create();
 
@@ -63,10 +61,10 @@ public class LoginActivity  extends AppCompatActivity {
         AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken newAccessToken) {
-                updateWithToken(newAccessToken);
+//                updateWithToken(newAccessToken); // 실행 후 로그아웃 후 재 로그인 시 여기로
             }
         };
-        updateWithToken(AccessToken.getCurrentAccessToken());
+        updateWithToken(AccessToken.getCurrentAccessToken()); // 로그아웃 후 재실행 시 여기로
 
 
         login.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -81,7 +79,7 @@ public class LoginActivity  extends AppCompatActivity {
                                 // Application code
                                 try {
                                     Profile profile = Profile.getCurrentProfile();
-                                    UserName = profile.getName();
+                                    UserName = object.getString("name");
                                     UserID = loginResult.getAccessToken().getUserId();
                                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                     intent.putExtra("userid",UserID);
