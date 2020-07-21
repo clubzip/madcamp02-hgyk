@@ -90,6 +90,14 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="com.example.madwin.listviewexample1.MainActivity"
         tools:showIn="@layout/activity_main">
+        <TextView
+            android:id="@+id/nobody"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="아직 아무도 출근 안했어요!"
+            android:layout_centerInParent="true"
+            android:textSize="25dp"
+            android:visibility="invisible"/>
 
 
         <LinearLayout

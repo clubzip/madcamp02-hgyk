@@ -28,30 +28,34 @@ class WorkThread extends Thread {
 
     @Override
     public void run() {
-        URL imgurl;
-        try {
-            imgurl = new URL(ServerUrl);
-            HttpURLConnection conn = (HttpURLConnection) imgurl.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
-            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        synchronized (this) {
+            URL imgurl;
+            try {
+                imgurl = new URL(ServerUrl);
+                HttpURLConnection conn = (HttpURLConnection) imgurl.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-            String json = "{\"name\": \"" + UserName + "\", \"date\": \"" + Today + "\", \"start\": \"" + Time + "\"}";
+                String json = "{\"name\": \"" + UserName + "\", \"date\": \"" + Today + "\", \"start\": \"" + Time + "\"}";
 
-            OutputStream os = conn.getOutputStream();
-            os.write(json.getBytes("UTF-8"));
-            os.close();
+                OutputStream os = conn.getOutputStream();
+                os.write(json.getBytes("UTF-8"));
+                os.close();
 
-            conn.connect();
+                conn.connect();
 
-            InputStream is = conn.getInputStream();
+                InputStream is = conn.getInputStream();
+                conn.disconnect();//추가함!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                notify();
 
-        } catch (MalformedURLException e) {
-            Log.e("ERROR1", e.getMessage());
-        } catch (IOException e) {
-            Log.e("ERROR2", e.getMessage());
-            e.printStackTrace();
+            } catch (MalformedURLException e) {
+                Log.e("ERROR1", e.getMessage());
+            } catch (IOException e) {
+                Log.e("ERROR2", e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 }

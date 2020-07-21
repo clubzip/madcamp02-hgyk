@@ -36,8 +36,7 @@ public class LoginActivity  extends AppCompatActivity {
             UserID = currentAccessToken.getUserId();
             Profile profile = Profile.getCurrentProfile();
 
-            UserName = "프로필이름";
-//            UserName = profile.getName();
+            UserName = profile.getName();
 
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.putExtra("username", UserName);
@@ -67,6 +66,11 @@ public class LoginActivity  extends AppCompatActivity {
 //                updateWithToken(newAccessToken); // 실행 후 로그아웃 후 재 로그인 시 여기로
             }
         };
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         updateWithToken(AccessToken.getCurrentAccessToken()); // 로그아웃 후 재실행 시 여기로
 
 

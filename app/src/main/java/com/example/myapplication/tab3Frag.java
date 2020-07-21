@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,6 +66,8 @@ public class tab3Frag extends Fragment {
     TextView datetoday;
     TextView starttime;
     TextView endtime;
+    TextView nobody;
+    private tab3Frag mFragment = this;
 
 
 
@@ -92,6 +95,8 @@ public class tab3Frag extends Fragment {
         datetoday = (TextView) view.findViewById(R.id.dateOfToday);
         starttime = (TextView) view.findViewById(R.id.Text_workTime);
         endtime = (TextView) view.findViewById(R.id.Text_leaveTime);
+        nobody = (TextView) view.findViewById(R.id.nobody);
+
 
         datetoday.setText(sdftoday_screen.format(date));
 
@@ -107,8 +112,10 @@ public class tab3Frag extends Fragment {
         if(wait == "failToGetRANK"){
             Log.d("JSONTaskRank", "failToGetRANK");
         } else if (wait == "NoDATA"){
+            nobody.setVisibility(View.VISIBLE);
             // visibility
         } else {
+            nobody.setVisibility(View.INVISIBLE);
             JSONArray jsonArray = null;
             try {
                 jsonArray = new JSONArray(wait);
@@ -206,6 +213,10 @@ public class tab3Frag extends Fragment {
         stampWork.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(!starttime.getText().equals("아직 출근 전이에요!!")){
+                    Toast.makeText(getApplicationContext(), "이미 출근하셨네요ㅠ", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("출근하셨나요?");
                 builder.setPositiveButton("네...", new DialogInterface.OnClickListener(){
@@ -225,6 +236,15 @@ public class tab3Frag extends Fragment {
 
                         WorkThread wThread = new WorkThread("http://192.249.19.244:2980/api/work/"+UserID, UserName,today,time);
                         wThread.start();
+                        synchronized (wThread){
+                            try {
+                                wThread.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.detach(mFragment).attach(mFragment).commit();
                     }
                 });
 
@@ -242,6 +262,10 @@ public class tab3Frag extends Fragment {
         stampLeave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+                if(!endtime.getText().equals("아직 퇴근 전이에요ㅜㅜ")){
+                    Toast.makeText(getApplicationContext(), "이미 퇴근하셨네요!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("퇴근하시나요?");
                 builder.setPositiveButton("네!", new DialogInterface.OnClickListener(){
@@ -354,6 +378,7 @@ public class tab3Frag extends Fragment {
 
                     con.connect();//연결 수행
                     if(con.getResponseCode() == 404) {
+                        return "NoDATA";
                         //아직 아무도 출근 안함.
                     }
 
