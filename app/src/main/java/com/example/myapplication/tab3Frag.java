@@ -25,9 +25,9 @@ import java.util.concurrent.ExecutionException;
 public class tab3Frag extends Fragment {
 
     View view;
-    ListView listView;
     Button stampWork;
     Button stampLeave;
+    private ArrayList<WorkHolder> mWorkHolderList;
 
     public tab3Frag() {
 
@@ -38,14 +38,24 @@ public class tab3Frag extends Fragment {
                              Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.tab3_main, container, false);
-        listView =(ListView) view.findViewById(R.id.listView);
         stampWork = (Button) view.findViewById(R.id.stamp_work);
         stampLeave = (Button) view.findViewById(R.id.stamp_leave);
+
+        mWorkHolderList = new ArrayList<>();
+        mWorkHolderList.add(new tab3_todayHolder());
+        mWorkHolderList.add(new tab3_rankHolder());
+
+        // show contents
+        WorkAdapter workAdapter = new WorkAdapter(mWorkHolderList);
+        ListView listView = (ListView) view.findViewById(R.id.listView_work);
+        listView.setAdapter(workAdapter);
 
 
 
         return view;
     }
+
+
 
 
 }
