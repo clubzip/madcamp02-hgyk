@@ -26,9 +26,8 @@ public class tab3Frag extends Fragment {
 
     View view;
     ListView listView;
-    ListViewAdapter listViewAdapter;
-    ArrayList<ListViewItem> data = new ArrayList<>();
-    String UserID;
+    Button stampWork;
+    Button stampLeave;
 
     public tab3Frag() {
 
@@ -38,10 +37,12 @@ public class tab3Frag extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        view = inflater.inflate(R.layout.contact_main, container, false);
+        view = inflater.inflate(R.layout.tab3_main, container, false);
         listView =(ListView) view.findViewById(R.id.listView);
-        data = new ArrayList<>();
-        listViewAdapter = new ListViewAdapter();
+        stampWork = (Button) view.findViewById(R.id.stamp_work);
+        stampLeave = (Button) view.findViewById(R.id.stamp_leave);
+
+
 
         return view;
     }
