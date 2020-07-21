@@ -8,17 +8,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginHorizontal="15dp"
         android:id="@+id/dateOfTodayBox"
         tools:ignore="MissingConstraints">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="오늘 날짜 :"/>
+            android:paddingTop="10dp"
+            android:text="오늘 날짜 :"
+            android:textSize="20dp"/>
         <TextView
             android:id="@+id/dateOfToday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="2020년 7월 21일"
+            android:textSize="20dp"
             android:layout_marginLeft="20dp"/>
 
     </LinearLayout>
@@ -27,17 +31,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginHorizontal="15dp"
         android:layout_marginTop="5dp"
         app:layout_constraintTop_toBottomOf="@+id/dateOfTodayBox">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="출근 시간: "/>
+            android:text="출근 시간: "
+            android:textSize="20dp"/>
         <TextView
             android:id="@+id/Text_workTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="9시 30분"
+            android:textSize="20dp"
             android:layout_marginLeft="20dp"/>
     </LinearLayout>
     <LinearLayout
@@ -46,16 +53,19 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="5dp"
+        android:layout_marginHorizontal="15dp"
         app:layout_constraintTop_toBottomOf="@+id/workTimeBox">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="퇴근 시간: "/>
+            android:text="퇴근 시간: "
+            android:textSize="20dp"/>
         <TextView
             android:id="@+id/Text_leaveTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="17시 30분"
+            android:textSize="20dp"
             android:layout_marginLeft="20dp"/>
 
     </LinearLayout>
@@ -63,21 +73,39 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:padding="4dp"
         app:layout_constraintTop_toBottomOf="@+id/leaveTimeBox"
         tools:ignore="MissingConstraints">
-
-        <TextView
-            android:id="@+id/Text_rank"
+        <LinearLayout
+            android:id="@+id/hi"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="오늘의 출근 시간 랭킹"/>
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:background="#E8E8E8"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/crown"/>
+
+            <TextView
+                android:id="@+id/Text_rank"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="오늘의 출근 시간 랭킹"
+                android:textSize="20dp"/>
+        </LinearLayout>
+
 
         <ListView
             android:id="@+id/listView_workRank"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
             android:textFilterEnabled="true"
-            app:layout_constraintTop_toBottomOf="@id/Text_rank"/>
+            app:layout_constraintTop_toBottomOf="@id/hi"/>
 
     </LinearLayout>
     <RelativeLayout

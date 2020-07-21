@@ -118,7 +118,7 @@ public class RankViewAdapter extends BaseAdapter implements Filterable {
         RankViewItem rankViewItem = filteredItemList.get(position);
 
         textView1.setText(rankViewItem.getName());
-        textView2.setText(rankViewItem.getNumber());
+        textView2.setText(rankViewItem.getNumber().substring(0,2)+"시 "+rankViewItem.getNumber().substring(2,4)+"분 "+rankViewItem.getNumber().substring(4)+"초");
 
         return convertView;
     }
