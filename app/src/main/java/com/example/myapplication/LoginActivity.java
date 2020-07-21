@@ -34,7 +34,7 @@ public class LoginActivity  extends AppCompatActivity {
 
         if (currentAccessToken != null) {
             Profile profile = Profile.getCurrentProfile();
-            UserName = profile.getName();
+            UserName = "profile.getName()";
             UserID = currentAccessToken.getUserId();
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.putExtra("username", UserName);

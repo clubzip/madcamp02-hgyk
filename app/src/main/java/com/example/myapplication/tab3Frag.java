@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,13 +18,21 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,7 +52,7 @@ public class tab3Frag extends Fragment {
     String time;
     String time_screen;
 
-    long now= System.currentTimeMillis()+32400000;
+    long now= System.currentTimeMillis();
     Date date = new Date(now);
     TextView datetoday;
     TextView starttime;
@@ -74,6 +83,55 @@ public class tab3Frag extends Fragment {
 
 
         datetoday.setText(sdftoday_screen.format(date));
+
+        String waitTODAY = "failToGetDATA";
+
+        try {
+            today = sdftoday.format(date);
+            waitTODAY = new JSONTask_WorkDataFromDB().execute("http://192.249.19.244:2980/api/work/get/"+today+"/"+"test1").get();
+
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (waitTODAY == "failToGetDATA"){
+            Log.d("JSONTask_WorkDataFromDB", "failToGetDATA");
+        } else if (waitTODAY == "NoDATA"){
+            starttime.setText("아직 출근 전이에요!!");
+            endtime.setText("아직 퇴근 전이에요ㅜㅜ");
+        } else {
+            if(!waitTODAY.contains("\"end\"")){ // 퇴근 전
+                try {
+                    JSONArray jsonArray = new JSONArray(waitTODAY);
+                    JSONObject jsonObject = jsonArray.getJSONObject(0);
+                    String getStartTime = (String) jsonObject.get("start");
+                    starttime.setText(getStartTime);
+                    endtime.setText("아직 퇴근 전이에요ㅜㅜ");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            } else { // 퇴근 후
+                JSONArray jsonArray = null;
+                try {
+                    jsonArray = new JSONArray(waitTODAY);
+                    JSONObject jsonObject = jsonArray.getJSONObject(0);
+                    String getStartTime = (String) jsonObject.get("start");
+                    String getEndTime = (String) jsonObject.get("end");
+                    starttime.setText(getStartTime);
+                    endtime.setText(getEndTime);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        }
+
+
+
 
 /*        mWorkHolderList = new ArrayList<>();
         mWorkHolderList.add(new tab3_todayHolder());
@@ -159,6 +217,64 @@ public class tab3Frag extends Fragment {
             }
         });
         return view;
+    }
+
+    public class JSONTask_WorkDataFromDB extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                HttpURLConnection con = null;
+                BufferedReader reader = null;
+                try{
+                    URL url = new URL(urls[0]);//url을 가져온다.
+                    con = (HttpURLConnection) url.openConnection();
+                    con.setRequestMethod("POST");
+                    con.setDoInput(true);
+                    con.connect(); // connect
+
+                    if(con.getResponseCode() == 404) { // DB에도 데이터 없음 - 출근 전
+                        return "NoDATA";
+                    } else {
+                        // DB에서 document 정보 가져오기
+                        InputStream stream = con.getInputStream();
+                        reader = new BufferedReader(new InputStreamReader(stream));
+                        StringBuffer buffer = new StringBuffer();
+                        String line = "";
+
+                        //아래라인은 실제 reader에서 데이터를 가져오는 부분이다. 즉 node.js서버로부터 데이터를 가져온다.
+                        while((line = reader.readLine()) != null){
+                            buffer.append(line);
+                        }
+                        String bufferStr = buffer.toString();
+                        Log.d("PRINTgetinfo", bufferStr);
+
+                        return bufferStr; // json 형태의 string 반환
+                    }
+
+                } catch (MalformedURLException e){
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    //종료가 되면 disconnect메소드를 호출한다.
+                    if(con != null){
+                        con.disconnect();
+                    }
+                    try {
+                        //버퍼를 닫아준다.
+                        if(reader != null){
+                            reader.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }//finally 부분
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
     }
 
 
