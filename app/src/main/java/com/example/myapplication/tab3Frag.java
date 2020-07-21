@@ -36,7 +36,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
@@ -52,6 +55,10 @@ public class tab3Frag extends Fragment {
     String today;
     String time;
     String time_screen;
+
+    ListView listView;
+    RankViewAdapter rankViewAdapter;
+    ArrayList<RankViewItem> data = new ArrayList<>();
 
     long now= System.currentTimeMillis();
     Date date = new Date(now);
@@ -77,6 +84,9 @@ public class tab3Frag extends Fragment {
                              Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.tab3_main, container, false);
+        listView = view.findViewById(R.id.listView_workRank);
+        rankViewAdapter = new RankViewAdapter();
+        data = new ArrayList<>();
         stampWork = (Button) view.findViewById(R.id.stamp_work);
         stampLeave = (Button) view.findViewById(R.id.stamp_leave);
         datetoday = (TextView) view.findViewById(R.id.dateOfToday);
@@ -84,19 +94,76 @@ public class tab3Frag extends Fragment {
         endtime = (TextView) view.findViewById(R.id.Text_leaveTime);
 
         datetoday.setText(sdftoday_screen.format(date));
-        try {
-            String wait = new JSONTaskRank().execute("http://192.249.19.244:2980/api/work/get/"+sdftoday.format(date)).get();
 
+        // GET RANK
+        String wait = "failToGetRANK";
+        try {
+            wait = new JSONTaskRank().execute("http://192.249.19.244:2980/api/work/get/"+sdftoday.format(date)).get();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        String waitTODAY = "failToGetDATA";
+        if(wait == "failToGetRANK"){
+            Log.d("JSONTaskRank", "failToGetRANK");
+        } else if (wait == "NoDATA"){
+            // visibility
+        } else {
+            JSONArray jsonArray = null;
+            try {
+                jsonArray = new JSONArray(wait);
+                // sort jsonArray
+                List<JSONObject> jsonObjectList = new ArrayList<JSONObject>();
+                for (int i = 0; i < jsonArray.length(); i++){
+                    jsonObjectList.add(jsonArray.getJSONObject(i));
+                }
 
+                Collections.sort(jsonObjectList, new Comparator<JSONObject>() {
+                    public int compare(JSONObject a, JSONObject b) {
+                        String valA = new String();
+                        String valB = new String();
+
+                        try{
+                            valA = (String) a.get("start");
+                            valB = (String) b.get("start");
+                        } catch (JSONException e){
+                            e.printStackTrace();
+                        }
+
+                        return valA.compareTo(valB);
+                    }
+                });
+
+                JSONArray sortedJsonArray = new JSONArray();
+
+                for (int jsonI = 0; jsonI < jsonArray.length();jsonI++){
+                    sortedJsonArray.put(jsonObjectList.get(jsonI));
+                }
+
+
+                for(int i=0; i<sortedJsonArray.length();i++) { // 안되면 -1 빼고 쉼표 빼기
+                    JSONObject jo = sortedJsonArray.getJSONObject(i);
+                    String name = jo.getString("name");
+                    String dial = jo.getString("start");
+                    data.add(rankViewAdapter.addItem(name, dial));
+                }
+
+                //리스트뷰에 어뎁터 set
+                listView.setAdapter(rankViewAdapter);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+
+
+
+        // GET TODAY'S PERSONAL DATA
+        String waitTODAY = "failToGetDATA";
         try {
             today = sdftoday.format(date);
-            waitTODAY = new JSONTask_WorkDataFromDB().execute("http://192.249.19.244:2980/api/work/get/"+today+"/"+"test1").get();
+            waitTODAY = new JSONTask_WorkDataFromDB().execute("http://192.249.19.244:2980/api/work/get/"+today+"/"+UserID).get();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

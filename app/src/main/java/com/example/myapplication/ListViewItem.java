@@ -1,21 +1,9 @@
 package com.example.myapplication;
 
-import android.graphics.drawable.Drawable;
-import android.widget.ImageView;
-
 public class ListViewItem {
 
     private String name;
     private String dial;
-//    private String profile;
-
-//    public void setProfile(String profile_image) {
-//        this.profile = profile_image;
-//    }
-
-//    public String getProfile() {
-//        return this.profile;
-//    }
 
     public String getName() {
         return this.name;
