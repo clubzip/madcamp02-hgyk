@@ -34,13 +34,16 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 public class tab3Frag extends Fragment {
 
     View view;
-    ListView listView;
     Button stampWork;
     Button stampLeave;
+
     String UserID;
     String UserName;
     String today;
     String time;
+
+    private ArrayList<WorkHolder> mWorkHolderList;
+
 
     SimpleDateFormat sdftoday = new SimpleDateFormat("yyyy-MM-dd");
     SimpleDateFormat sdftime = new SimpleDateFormat("HHmmss");
@@ -55,9 +58,9 @@ public class tab3Frag extends Fragment {
                              Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.tab3_main, container, false);
-        listView =(ListView) view.findViewById(R.id.listView);
         stampWork = (Button) view.findViewById(R.id.stamp_work);
         stampLeave = (Button) view.findViewById(R.id.stamp_leave);
+
 
         stampWork.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,7 +98,7 @@ public class tab3Frag extends Fragment {
         });
         stampLeave.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("퇴근하시나요?");
                 builder.setPositiveButton("네!", new DialogInterface.OnClickListener(){
@@ -109,6 +112,17 @@ public class tab3Frag extends Fragment {
 
                         today = sdftoday.format(date);
                         time = sdftime.format(date);
+
+        mWorkHolderList = new ArrayList<>();
+        mWorkHolderList.add(new tab3_todayHolder());
+        mWorkHolderList.add(new tab3_rankHolder());
+
+        // show contents
+        WorkAdapter workAdapter = new WorkAdapter(mWorkHolderList);
+        ListView listView = (ListView) view.findViewById(R.id.listView_work);
+        listView.setAdapter(workAdapter);
+
+
 
                         LeaveThread lThread = new LeaveThread("http://192.249.19.244:2980/api/leave/"+UserID, today,time);
                         lThread.start();
@@ -128,6 +142,8 @@ public class tab3Frag extends Fragment {
         });
         return view;
     }
+
+
 
 
 }
