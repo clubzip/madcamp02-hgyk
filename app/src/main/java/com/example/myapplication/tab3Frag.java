@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,7 +24,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,7 +49,7 @@ public class tab3Frag extends Fragment {
     String time;
     String time_screen;
 
-    long now= System.currentTimeMillis()+32400000;
+    long now= System.currentTimeMillis();
     Date date = new Date(now);
     TextView datetoday;
     TextView starttime;
@@ -61,6 +67,73 @@ public class tab3Frag extends Fragment {
         UserName = username;
     }
 
+    public class JSONTaskRank extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                HttpURLConnection con = null;
+                BufferedReader reader = null;
+
+                try{
+                    URL url = new URL(urls[0]);//url을 가져온다.
+                    con = (HttpURLConnection) url.openConnection();
+                    con.setRequestMethod("POST");
+                    con.setDoOutput(true); //GET일 때 비활성화
+                    con.setDoInput(true);
+                    con.setRequestProperty("Content-Type","application/json; charset=UTF-8"); // POST, PUT일때 활성화
+
+                    con.connect();//연결 수행
+                    if(con.getResponseCode() == 404) {
+                        //아직 아무도 출근 안함.
+                    }
+
+                    //입력 스트림 생성
+                    InputStream stream = con.getInputStream();
+
+                    //속도를 향상시키고 부하를 줄이기 위한 버퍼를 선언한다.
+                    reader = new BufferedReader(new InputStreamReader(stream));
+
+                    //실제 데이터를 받는곳
+                    StringBuffer buffer = new StringBuffer();
+
+                    //line별 스트링을 받기 위한 temp 변수
+                    String line = "";
+
+                    //아래라인은 실제 reader에서 데이터를 가져오는 부분이다. 즉 node.js서버로부터 데이터를 가져온다.
+                    while((line = reader.readLine()) != null){
+                        buffer.append(line);
+                    }
+
+                    //다 가져오면 String 형변환을 수행한다. 이유는 protected String doInBackground(String... urls) 니까
+                    return buffer.toString();
+
+                    //아래는 예외처리 부분이다.
+                } catch (MalformedURLException e){
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    //종료가 되면 disconnect메소드를 호출한다.
+                    if(con != null){
+                        con.disconnect();
+                    }
+                    try {
+                        //버퍼를 닫아준다.
+                        if(reader != null){
+                            reader.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }//finally 부분
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -72,8 +145,15 @@ public class tab3Frag extends Fragment {
         starttime = (TextView) view.findViewById(R.id.Text_workTime);
         endtime = (TextView) view.findViewById(R.id.Text_leaveTime);
 
-
         datetoday.setText(sdftoday_screen.format(date));
+
+        try {
+            String wait = new JSONTaskRank().execute("http://192.249.19.244:2980/api/work/get/"+sdftoday.format(date)).get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
 /*        mWorkHolderList = new ArrayList<>();
         mWorkHolderList.add(new tab3_todayHolder());
@@ -95,7 +175,7 @@ public class tab3Frag extends Fragment {
                     public void onClick(DialogInterface dialog, int id)
                     {
                         Toast.makeText(getApplicationContext(), "오늘도 화이팅!!", Toast.LENGTH_SHORT).show();
-                        now = System.currentTimeMillis()+32400000;
+                        now = System.currentTimeMillis();
                         date = new Date(now);
 
                         time_screen = sdftime_screen.format(date);
@@ -131,7 +211,7 @@ public class tab3Frag extends Fragment {
                     public void onClick(DialogInterface dialog, int id)
                     {
                         Toast.makeText(getApplicationContext(), "고생하셨어요~", Toast.LENGTH_SHORT).show();
-                        now = System.currentTimeMillis()+32400000;
+                        now = System.currentTimeMillis();
 
                         date = new Date(now);
 

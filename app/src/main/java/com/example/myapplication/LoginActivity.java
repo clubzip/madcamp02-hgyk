@@ -33,9 +33,10 @@ public class LoginActivity  extends AppCompatActivity {
     private void updateWithToken(AccessToken currentAccessToken) {
 
         if (currentAccessToken != null) {
+
+            UserID = currentAccessToken.getUserId();
             Profile profile = Profile.getCurrentProfile();
             UserName = profile.getName();
-            UserID = currentAccessToken.getUserId();
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.putExtra("username", UserName);
             intent.putExtra("userid",UserID);
