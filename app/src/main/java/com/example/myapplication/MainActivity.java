@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         UserID = intent.getStringExtra("userid");
+        UserName = intent.getStringExtra("username");
 
         galleryFrag = new GalleryFrag(UserID);//UserID넣는 걸로 바꾸고 Frag안에서 네트워킹 구현
         contactFrag = new ContactFrag(UserID);

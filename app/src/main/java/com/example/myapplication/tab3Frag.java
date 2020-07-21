@@ -180,7 +180,7 @@ public class tab3Frag extends Fragment {
                     JSONArray jsonArray = new JSONArray(waitTODAY);
                     JSONObject jsonObject = jsonArray.getJSONObject(0);
                     String getStartTime = (String) jsonObject.get("start");
-                    starttime.setText(getStartTime);
+                    starttime.setText(getStartTime.substring(0,2)+"시 "+getStartTime.substring(2,4)+"분 "+getStartTime.substring(4)+"초");
                     endtime.setText("아직 퇴근 전이에요ㅜㅜ");
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -193,8 +193,9 @@ public class tab3Frag extends Fragment {
                     JSONObject jsonObject = jsonArray.getJSONObject(0);
                     String getStartTime = (String) jsonObject.get("start");
                     String getEndTime = (String) jsonObject.get("end");
-                    starttime.setText(getStartTime);
-                    endtime.setText(getEndTime);
+
+                    starttime.setText(getStartTime.substring(0,2)+"시 "+getStartTime.substring(2,4)+"분 "+getStartTime.substring(4)+"초");
+                    endtime.setText(getEndTime.substring(0,2)+"시 "+getEndTime.substring(2,4)+"분 "+getEndTime.substring(4)+"초");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
