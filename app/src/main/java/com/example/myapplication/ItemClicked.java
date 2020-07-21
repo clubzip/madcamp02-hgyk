@@ -35,6 +35,8 @@ import java.io.InputStream;
 
 public class ItemClicked extends AppCompatActivity {
 
+    String UserID;
+
     public void OnClickCall(View v){
         TextView number = (TextView) findViewById(R.id.tv_pn);
         String call_number = "tel:"+number.getText();
@@ -62,7 +64,7 @@ public class ItemClicked extends AppCompatActivity {
         Intent intent = new Intent(this, RemovePopUp.class);
         TextView name = (TextView) findViewById(R.id.tv_name);
         intent.putExtra("name",name.getText());
-        intent.putExtra("UserID", intent.getStringExtra("UserID"));
+        intent.putExtra("UserID", UserID); // intent.getStringExtra("UserID")
         startActivityForResult(intent, 1);
         //팝업메세지 onclick_yes : json파일에서 해당 text 정보 담고 있는 라인 삭제.
         //item clicked도 result로 실행해야 할듯
@@ -93,6 +95,8 @@ public class ItemClicked extends AppCompatActivity {
 
         name.setText(intent.getStringExtra("name"));
         dial.setText(intent.getStringExtra("dial"));
+        UserID = intent.getStringExtra("UserID");
+
 //        String profile =intent.getStringExtra("profile");
 //        if(profile.equals("default_image")) {
 //            imageView1.setImageResource(R.drawable.default_image);

@@ -73,7 +73,7 @@
                 android:id="@+id/tv_pn"
                 android:inputType="phone"
                 android:hint="전화번호를 입력하세요."
-                android:maxLength="13"
+                android:maxLength="15"
                 android:textSize="20dp"/>
         </LinearLayout>
     </LinearLayout>

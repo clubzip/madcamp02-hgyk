@@ -23,6 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
+
         <activity android:name=".FullImageActivity" />
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -33,6 +34,9 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+        <activity android:name=".ContactAdd" />
+        <activity android:name=".ItemClicked" />
+        <activity android:name=".RemovePopUp" />
     </application>
 
 </manifest>
