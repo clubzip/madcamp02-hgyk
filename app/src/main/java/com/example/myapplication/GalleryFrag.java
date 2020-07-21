@@ -184,7 +184,13 @@ public class GalleryFrag extends Fragment {
             e.printStackTrace();
         }*/
         DataFromServer = DataFromServer.replaceAll("\\\"","");
-        String[] imagesinDB = DataFromServer.substring(DataFromServer.indexOf(":[")+2,DataFromServer.indexOf("]")).split(",");
+        int start_index = DataFromServer.indexOf(":[")+2;
+        int end_index = DataFromServer.indexOf("]");
+        String[] imagesinDB = new String[0];
+        if ( start_index != end_index) {
+            imagesinDB = DataFromServer.substring(DataFromServer.indexOf(":[")+2,DataFromServer.indexOf("]")).split(",");
+        }
+
         imagelistinDB = new ArrayList<>(Arrays.asList(imagesinDB));
         //외부 저장소에 저장된 파일 리스트와 비교.
         File dir = new File(mImageDirPath);
