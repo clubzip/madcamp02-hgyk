@@ -58,8 +58,11 @@ public class tab3Frag extends Fragment {
     String time_screen;
 
     ListView listView;
+    ListView listViewTime;
     RankViewAdapter rankViewAdapter;
+    TimeViewAdapter timeViewAdapter;
     ArrayList<RankViewItem> data = new ArrayList<>();
+    ArrayList<TimeViewItem> dataTime = new ArrayList<>();
 
     long now= System.currentTimeMillis();
     Date date = new Date(now);
@@ -88,8 +91,11 @@ public class tab3Frag extends Fragment {
 
         view = inflater.inflate(R.layout.tab3_main, container, false);
         listView = view.findViewById(R.id.listView_workRank);
+        listViewTime = view.findViewById(R.id.listView_workTimeRank);
         rankViewAdapter = new RankViewAdapter();
+        timeViewAdapter = new TimeViewAdapter();
         data = new ArrayList<>();
+        dataTime = new ArrayList<>();
         stampWork = (Button) view.findViewById(R.id.stamp_work);
         stampLeave = (Button) view.findViewById(R.id.stamp_leave);
         datetoday = (TextView) view.findViewById(R.id.dateOfToday);
@@ -157,6 +163,83 @@ public class tab3Frag extends Fragment {
 
                 //리스트뷰에 어뎁터 set
                 listView.setAdapter(rankViewAdapter);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+
+        // GET TIME RANK
+        String waitTime = "failToGetRANK";
+        try {
+            waitTime = new JSONTaskRank().execute("http://192.249.19.244:2980/api/work/get/"+sdftoday.format(date)).get(); //바꾸기
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if(waitTime == "failToGetRANK"){
+            Log.d("JSONTaskRank", "failToGetRANK");
+        } else if (waitTime == "NoDATA"){
+            // visibility
+        } else {
+            JSONArray jsonArray = null;
+            try {
+                jsonArray = new JSONArray(waitTime);
+                // sort jsonArray
+                List<JSONObject> jsonObjectList = new ArrayList<JSONObject>();
+                for (int i = 0; i < jsonArray.length(); i++){
+                    if (jsonArray.getJSONObject((i)).get("end") != null) {
+                        jsonObjectList.add(jsonArray.getJSONObject(i));
+                    }
+                }
+
+                List<JSONObject> jsonObjectList_TIME = new ArrayList<JSONObject>();
+                for (int i = 0; i < jsonObjectList.size(); i++){
+                    JSONObject obj = new JSONObject();
+                    String stamp_start = (String) jsonObjectList.get(i).get("start");
+                    String stamp_end = (String) jsonObjectList.get(i).get("end");
+                    int start_ = Integer.parseInt(stamp_start.substring(0,2))*3600 + Integer.parseInt(stamp_start.substring(2,4))*60 + Integer.parseInt(stamp_start.substring(4));
+                    int end_ = Integer.parseInt(stamp_end.substring(0,2))*3600 + Integer.parseInt(stamp_end.substring(2,4))*60 + Integer.parseInt(stamp_end.substring(4));
+                    int total_ = end_ - start_;
+                    obj.put("time", total_);
+                    obj.put("name", jsonObjectList.get(i).get("name"));
+                    jsonObjectList_TIME.add(obj);
+                }
+
+                Collections.sort(jsonObjectList_TIME, new Comparator<JSONObject>() {
+                    public int compare(JSONObject a, JSONObject b) {
+                        int valA = 0;
+                        int valB = 0;
+
+                        try{
+                            valA = (int) a.get("time");
+                            valB = (int) b.get("time");
+                        } catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                        if (valA > valB) return -1;
+                        else return 1;
+                    }
+                });
+
+                JSONArray sortedJsonArray_TIME = new JSONArray();
+
+                for (int jsonI = 0; jsonI < jsonArray.length();jsonI++){
+                    sortedJsonArray_TIME.put(jsonObjectList_TIME.get(jsonI));
+                }
+
+
+                for(int i=0; i<sortedJsonArray_TIME.length();i++) { // 안되면 -1 빼고 쉼표 빼기
+                    JSONObject jo = sortedJsonArray_TIME.getJSONObject(i);
+                    String name = jo.getString("name");
+                    String time = jo.getString("time");
+                    dataTime.add(timeViewAdapter.addItem(name, time));
+                }
+
+                //리스트뷰에 어뎁터 set
+                listViewTime.setAdapter(timeViewAdapter);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
