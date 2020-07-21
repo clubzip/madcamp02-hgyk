@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
     private GalleryFrag galleryFrag;
     private ContactFrag contactFrag;
+    private tab3Frag tab3Frag;
 
     private String UserID;
     private String DataFromServer;
@@ -175,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
         galleryFrag = new GalleryFrag(UserID);//UserID넣는 걸로 바꾸고 Frag안에서 네트워킹 구현
         contactFrag = new ContactFrag(UserID);
+        tab3Frag = new tab3Frag();
 
         //UserID = "TESTID76";
 
@@ -195,11 +197,13 @@ public class MainActivity extends AppCompatActivity {
 
         viewPagerAdapter.addFragment(galleryFrag, "Gallery");
         viewPagerAdapter.addFragment(contactFrag, "Contact");
+        viewPagerAdapter.addFragment(tab3Frag, "tab3");
 
         viewPager.setAdapter(viewPagerAdapter);
 
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_baseline_collections_24);
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_baseline_contact_phone_24);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_baseline_calendar_today_24);
 
 
 

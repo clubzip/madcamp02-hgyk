@@ -191,8 +191,7 @@ public class ContactAdd extends AppCompatActivity {
                     setResult(Activity.RESULT_OK);
                     new ContactAdd.JSONTaskADD().execute("http://192.249.19.244:2980/api/contacts/add/facebookID/" + UserID);
 
-                    /*Intent main = new Intent(view.getContext(),MainActivity.class);
-                    startActivity(main);*/
+
                     finish();
 
                     //DB에 정보 {name: "ex", dial: "ex"} 추가
