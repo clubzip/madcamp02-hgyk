@@ -14,6 +14,7 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -26,13 +27,17 @@ public class LoginActivity  extends AppCompatActivity {
 
     private LoginButton login;
     private String UserID;
+    private String UserName;
     CallbackManager callbackManager;
 
     private void updateWithToken(AccessToken currentAccessToken) {
 
         if (currentAccessToken != null) {
+            Profile profile = Profile.getCurrentProfile();
+            UserName = profile.getName();
             UserID = currentAccessToken.getUserId();
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.putExtra("username", UserName);
             intent.putExtra("userid",UserID);
             startActivity(intent);
         }/* else {
@@ -74,9 +79,12 @@ public class LoginActivity  extends AppCompatActivity {
                             public void onCompleted(JSONObject object, GraphResponse response) {
                                 // Application code
                                 try {
+                                    Profile profile = Profile.getCurrentProfile();
+                                    UserName = profile.getName();
                                     UserID = loginResult.getAccessToken().getUserId();
                                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                     intent.putExtra("userid",UserID);
+                                    intent.putExtra("username", UserName);
                                     startActivity(intent);
 
                                     String name = object.getString("name"); // 혹시 쓸일 있을까봐 놔둠.

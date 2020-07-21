@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private tab3Frag tab3Frag;
 
     private String UserID;
+    private String UserName;
     private String DataFromServer;
     public boolean selectingImage = false;
     public String startTimeID;
@@ -173,10 +174,11 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         UserID = intent.getStringExtra("userid");
+        UserName = intent.getStringExtra("username");
 
         galleryFrag = new GalleryFrag(UserID);//UserID넣는 걸로 바꾸고 Frag안에서 네트워킹 구현
         contactFrag = new ContactFrag(UserID);
-        tab3Frag = new tab3Frag();
+        tab3Frag = new tab3Frag(UserID,UserName);
 
         //UserID = "TESTID76";
 
