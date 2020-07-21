@@ -3,7 +3,9 @@
 ### This package contains three tabs, that is, Gallery tab, Contact tab, and Calendar tab.
 
 ## 1. Gallery tab
-It prints the 2x10 grid view of for drawable resources in the package. If user touch the image, it expands the image.
+The first tab is a gallery of images of the app's own external storage. Click on the image in the gallery to see the enlarged picture. In this state, you can view the next image in slide motion. You can view the selection mode by holding down the image in the gallery for a while. Select the image in Select mode and press the camera-shaped floating button to delete it. (to be changed to a proper icon in the future) Pressing the camera-shaped floating button in the default mode instead of the select mode becomes the filming mode. Photos taken at this time are immediately reflected in the gallery. Photos taken in this app are not affected by other apps.
+
+
 
 ## 2. Contact tab
 The Contact tab prints the list of contact data which is stored in JSON file at its internal storage.
@@ -12,23 +14,6 @@ The profile image is selected from device's own gallery.
 In each contact item activity, user can execute the dial and sms to the data. Additionally, user can remove the data from JSON file.
 The Edit button is not implemented yet.
 
-## 3. Calendar tab
-Data of the desired period can be received and expressed calender (the program is from 2017 to 2030)
-Highlighted on clicked date.
-When double-clicking on the date, the memo tab can be opened, and it can be deleted and modified.
-Today's date, Saturdays, Sundays highlighted.
-
-
-
-# Technical issues
-
-### The tabs are implemented in fragment, and a view pager of MainActivity prints the view page for each fragment. 
-
-## 1. Gallery tab
-This fragment just set the drawable image for each imageButton.
-To implement the zoom function, we use zoomImageFromThumb method which prints a expanded view on screen.
-
-## 2. Contact tab
 This fragment contains custom listview. Thus, it contains 'ListViewAdapter' which extends BaseAdapter and 'ListViewItem'.
 ListViewAdapter implements Filterable for searching function. Each ListViewItem has three private member variables that contain the information of name, mobile number, and the name of profile image file. ListViewAdapter creates view for each row of custom listview using this data. Initially, these data are from JSON file at internal storage.
 
@@ -36,9 +21,9 @@ The addition and remove of contact data is implemented by rewrite the JSON file.
 
 The calling and Sending message is implemented with Uri.parse method.
 
-## 3. Calendar tab
-Main screen composed of fragment.
-Implement the basic form by implementing the API of java.util.calendar
-Implement DB by using android Room API
-Implement DB's addition and modification process by using Dao
-Use Decorate class to decorate dates (inherit DayViewDecorator)
+
+
+## 3. Work time checker
+
+
+
