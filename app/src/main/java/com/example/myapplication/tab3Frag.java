@@ -41,10 +41,18 @@ public class tab3Frag extends Fragment {
     String UserName;
     String today;
     String time;
+    String time_screen;
 
-    private ArrayList<WorkHolder> mWorkHolderList;
+    long now= System.currentTimeMillis()+32400000;
+    Date date = new Date(now);
+    TextView datetoday;
+    TextView starttime;
+    TextView endtime;
 
 
+
+    SimpleDateFormat sdftoday_screen = new SimpleDateFormat("yyyy년 MM월 dd일");
+    SimpleDateFormat sdftime_screen = new SimpleDateFormat("HH시 mm분 ss초");
     SimpleDateFormat sdftoday = new SimpleDateFormat("yyyy-MM-dd");
     SimpleDateFormat sdftime = new SimpleDateFormat("HHmmss");
 
@@ -60,6 +68,21 @@ public class tab3Frag extends Fragment {
         view = inflater.inflate(R.layout.tab3_main, container, false);
         stampWork = (Button) view.findViewById(R.id.stamp_work);
         stampLeave = (Button) view.findViewById(R.id.stamp_leave);
+        datetoday = (TextView) view.findViewById(R.id.dateOfToday);
+        starttime = (TextView) view.findViewById(R.id.Text_workTime);
+        endtime = (TextView) view.findViewById(R.id.Text_leaveTime);
+
+
+        datetoday.setText(sdftoday_screen.format(date));
+
+/*        mWorkHolderList = new ArrayList<>();
+        mWorkHolderList.add(new tab3_todayHolder());
+        mWorkHolderList.add(new tab3_rankHolder());
+
+        // show contents
+        WorkAdapter workAdapter = new WorkAdapter(mWorkHolderList);
+        ListView listView = (ListView) view.findViewById(R.id.listView_work);
+        listView.setAdapter(workAdapter);*/
 
 
         stampWork.setOnClickListener(new View.OnClickListener() {
@@ -72,13 +95,15 @@ public class tab3Frag extends Fragment {
                     public void onClick(DialogInterface dialog, int id)
                     {
                         Toast.makeText(getApplicationContext(), "오늘도 화이팅!!", Toast.LENGTH_SHORT).show();
+                        now = System.currentTimeMillis()+32400000;
+                        date = new Date(now);
 
-                        long now = System.currentTimeMillis();
-
-                        Date date = new Date(now);
+                        time_screen = sdftime_screen.format(date);
+                        starttime.setText(time_screen);
 
                         today = sdftoday.format(date);
                         time = sdftime.format(date);
+
 
                         WorkThread wThread = new WorkThread("http://192.249.19.244:2980/api/work/"+UserID, UserName,today,time);
                         wThread.start();
@@ -106,22 +131,15 @@ public class tab3Frag extends Fragment {
                     public void onClick(DialogInterface dialog, int id)
                     {
                         Toast.makeText(getApplicationContext(), "고생하셨어요~", Toast.LENGTH_SHORT).show();
-                        long now = System.currentTimeMillis();
+                        now = System.currentTimeMillis()+32400000;
 
-                        Date date = new Date(now);
+                        date = new Date(now);
+
+                        time_screen = sdftime_screen.format(date);
+                        endtime.setText(time_screen);
 
                         today = sdftoday.format(date);
                         time = sdftime.format(date);
-
-        mWorkHolderList = new ArrayList<>();
-        mWorkHolderList.add(new tab3_todayHolder());
-        mWorkHolderList.add(new tab3_rankHolder());
-
-        // show contents
-        WorkAdapter workAdapter = new WorkAdapter(mWorkHolderList);
-        ListView listView = (ListView) view.findViewById(R.id.listView_work);
-        listView.setAdapter(workAdapter);
-
 
 
                         LeaveThread lThread = new LeaveThread("http://192.249.19.244:2980/api/leave/"+UserID, today,time);
