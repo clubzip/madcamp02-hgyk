@@ -24,6 +24,8 @@
         </activity>
         <activity android:name=".MainActivity" />
         <activity android:name=".ContactAdd" />
+        <activity android:name=".ItemClicked" />
+        <activity android:name=".RemovePopUp" />
     </application>
 
 </manifest>

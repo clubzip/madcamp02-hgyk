@@ -4,8 +4,10 @@ package com.example.myapplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -29,8 +31,12 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
 
 public class RemovePopUp extends Activity {
+
+    String UserID;
+    String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,15 +47,15 @@ public class RemovePopUp extends Activity {
     }
 
     //제거 버튼 클릭
-    public void mOnRemove(View v) throws IOException, JSONException {
+    public void mOnRemove(View v) throws IOException, JSONException, ExecutionException, InterruptedException {
         //데이터 받아오기
         Intent intent = this.getIntent();
-        String name = intent.getStringExtra("name");
-        String UserID = intent.getStringExtra("UserID");
+        name = intent.getStringExtra("name");
+        UserID = intent.getStringExtra("UserID");
 
 
         //JSON파일에서 해당라인 지우기
-        File file = new File(this.getFilesDir()+UserID,"contact.json");
+        File file = new File(this.getFilesDir(),"contactList.json");
         FileInputStream fis = new FileInputStream(file);
         InputStreamReader isr= new InputStreamReader(fis);
         BufferedReader reader= new BufferedReader(isr);
@@ -57,9 +63,15 @@ public class RemovePopUp extends Activity {
         StringBuffer buffer= new StringBuffer();
         String line= reader.readLine();
         while (line!=null){ // name을 포함하지 않는 라인만 buffer에 넣기.
-            if(line.contains(name)) {
-                line=reader.readLine();
-                continue;
+            if(line.contains(UserID)) {
+                buffer.append(line+"\n");
+                line = reader.readLine();
+                String nameKey = "\""+name+"\"";
+                while(!line.contains(nameKey)){
+                    buffer.append(line+"\n");
+                    line = reader.readLine();
+                }
+                line = reader.readLine();
             }
             buffer.append(line+"\n");
             line=reader.readLine();
@@ -71,63 +83,59 @@ public class RemovePopUp extends Activity {
         }
         //      정보 삭제한 JSON파일을 다시 파일에 넣어주기
 
-        File fileOut = new File(this.getFilesDir()+UserID,"contact.json");
+        File fileOut = new File(this.getFilesDir(),"contactList.json");
         FileOutputStream fos= new FileOutputStream(fileOut);//openFileOutput("contact.json",MODE_PRIVATE);
         fos.write(jsonData.getBytes());
         fos.close();
 
         // DB 연락처 정보 삭제하기
-        try {
-            HttpURLConnection con = null;
-            BufferedReader readerdb = null;
+        String wait;
+        wait = new RemovePopUp.JSONTask_DeleteInfo().execute("http://192.249.19.244:2980/api/contacts/delete/facebookID/"+UserID).get();
+        if (wait == null){
+            setResult(RESULT_OK, intent);
+            // close activity pop up
+            finish();
+        }
+    }
 
-            try{
-                URL url = new URL("http://192.249.19.244:2980/api/contacts/delete/facebookID/"+UserID);//url을 가져온다.
-                con = (HttpURLConnection) url.openConnection();
+    public class JSONTask_DeleteInfo extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                HttpURLConnection con = null;
+                try{
+                    URL url = new URL(urls[0]);//url을 가져온다.
+                    con = (HttpURLConnection) url.openConnection();
 //                    con.setRequestMethod("POST");
-                con.setRequestMethod("PUT");
-                con.setDoOutput(true); //GET일 때 비활성화
-                con.setDoInput(true);
-                con.setRequestProperty("Content-Type","application/json; charset=UTF-8"); // POST, PUT일때 활성화
-                String json = "{\"name\": \""+name+"\"}";
-                OutputStream os = con.getOutputStream();
-                os.write(json.getBytes("UTF-8"));
-                os.close();
+                    con.setRequestMethod("POST");
+                    con.setDoOutput(true);
+                    con.setDoInput(true);
+                    con.setRequestProperty("Content-Type","application/json; charset=UTF-8");
+                    String json = "{\"name\": \""+name+"\"}";
+                    OutputStream os = con.getOutputStream();
+                    os.write(json.getBytes("UTF-8"));
+                    os.close();
 
-                con.connect();//연결 수행
-                    /*if(con.getResponseCode() == 404) {
+                    con.connect();//연결 수행
 
-                    }*/
+                    InputStream stream = con.getInputStream();
 
-                //아래는 예외처리 부분이다.
-            } catch (MalformedURLException e){
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                //종료가 되면 disconnect메소드를 호출한다.
-                if(con != null){
-                    con.disconnect();
-                }
-                try {
-                    //버퍼를 닫아준다.
-                    if(reader != null){
-                        reader.close();
-                    }
+                } catch (MalformedURLException e){
+                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
-            }//finally 부분
-        } catch (Exception e) {
-            e.printStackTrace();
+                } finally {
+                    //종료가 되면 disconnect메소드를 호출한다.
+                    if(con != null){
+                        con.disconnect();
+                    }
+                }//finally 부분
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
         }
-
-//        return null;
-
-        setResult(RESULT_OK, intent);
-
-        //액티비티(팝업) 닫기
-        finish();
     }
 
     //취소 버튼 클릭

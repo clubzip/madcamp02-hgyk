@@ -157,7 +157,7 @@ public class ContactAdd extends AppCompatActivity {
                         return;
                     }
 
-                    File file = new File(getFilesDir()+UserID,"contact.json");
+                    File file = new File(getFilesDir(),"contactList.json");
                     FileInputStream fis = new FileInputStream(file);
                     InputStreamReader isr= new InputStreamReader(fis);
                     BufferedReader reader= new BufferedReader(isr);
@@ -173,7 +173,6 @@ public class ContactAdd extends AppCompatActivity {
                             }
                             buffer.append("{\"name\":\"" + nameStr + "\",\"dial\":\"" + dialStr + "\"},\n");
                             line = reader.readLine();
-                            if (line == null) break;
                         }
                         buffer.append(line + "\n");
                         line = reader.readLine();
@@ -184,20 +183,25 @@ public class ContactAdd extends AppCompatActivity {
 
                     // json파일에 담기
 
-                    File fileOut = new File(getFilesDir()+UserID,"contact.json");
+                    File fileOut = new File(getFilesDir(),"contactList.json");
                     FileOutputStream fos = new FileOutputStream(fileOut);
                     fos.write(jsonData.getBytes());
                     fos.close();
 
                     setResult(Activity.RESULT_OK);
+                    new ContactAdd.JSONTaskADD().execute("http://192.249.19.244:2980/api/contacts/add/facebookID/" + UserID);
 
+                    Intent main = new Intent(view.getContext(),MainActivity.class);
+                    startActivity(main);
                     finish();
 
                     //DB에 정보 {name: "ex", dial: "ex"} 추가
-                    new ContactAdd.JSONTaskADD().execute("http://192.249.19.244:2980/api/contacts/add/facebookID/" + UserID);
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+
             }
         });
         addCancelButton.setOnClickListener(new View.OnClickListener() {

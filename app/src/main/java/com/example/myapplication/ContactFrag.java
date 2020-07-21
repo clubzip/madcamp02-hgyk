@@ -34,6 +34,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class ContactFrag extends Fragment {
@@ -161,58 +164,61 @@ public class ContactFrag extends Fragment {
                     e.printStackTrace();
                 }
             } else { // db에 데이터가 있는 경우, 파싱해서 넣어주기 (내부 저장소에는 없고, DB에는 있고)
-                String dbdb = wait;
-                Log.d("DataFromDB", dbdb);
                 // 데이터(wait) 파싱해서 strParsed 에 String 타입으로 저장
                 String strParsed;
                 StringBuffer stringBuffer = new StringBuffer();
                 int index = wait.indexOf(":[{");
                 int index2 = wait.indexOf("]}]");
-                String subStr = wait.substring(index+2, index2); // {},{},{}
-                String[] subStrArray = subStr.split(",");
-                for (int j=0; j<subStrArray.length - 2; j++){
-                    stringBuffer.append(subStrArray[j]+",");
-                    j++;
-                    stringBuffer.append(subStrArray[j]+",\n");
-                }
-                stringBuffer.append(subStrArray[subStrArray.length-2]+",");
-                stringBuffer.append(subStrArray[subStrArray.length-1]+"\n");
-                strParsed = stringBuffer.toString();
+                if (index != -1 && index2 != -1){
+                    String subStr = wait.substring(index+2, index2); // {},{},{}
+                    String[] subStrArray = subStr.split(",");
+                    for (int j=0; j<subStrArray.length - 2; j++){
+                        stringBuffer.append(subStrArray[j]+",");
+                        j++;
+                        stringBuffer.append(subStrArray[j]+",\n");
+                    }
+                    stringBuffer.append(subStrArray[subStrArray.length-2]+",");
+                    stringBuffer.append(subStrArray[subStrArray.length-1]+"\n");
+                    strParsed = stringBuffer.toString();
 
-                // 파싱한 데이터를 포함하여 다시 contactList.json에 넣기
-                FileInputStream fisD = null;
-                try {
-                    fisD = new FileInputStream(file);
-                    InputStreamReader isrD = new InputStreamReader(fisD);
-                    BufferedReader readerD = new BufferedReader(isrD);
-                    StringBuffer bufferD = new StringBuffer();
-                    String lineD = readerD.readLine(); // read [
-                    bufferD.append(lineD+'\n');
-                    for (int k=0; k<4; k++){
-                        lineD = readerD.readLine();
+                    // 파싱한 데이터를 포함하여 다시 contactList.json에 넣기
+                    FileInputStream fisD = null;
+                    try {
+                        fisD = new FileInputStream(file);
+                        InputStreamReader isrD = new InputStreamReader(fisD);
+                        BufferedReader readerD = new BufferedReader(isrD);
+                        StringBuffer bufferD = new StringBuffer();
+                        String lineD = readerD.readLine(); // read [
                         bufferD.append(lineD+'\n');
-                    }
-                    bufferD.append(strParsed);
-                    lineD = readerD.readLine();
-                    while (lineD != null){
-                        bufferD.append(lineD+"\n");
+                        for (int k=0; k<4; k++){
+                            lineD = readerD.readLine();
+                            bufferD.append(lineD+'\n');
+                        }
+                        bufferD.append(strParsed);
                         lineD = readerD.readLine();
+                        while (lineD != null){
+                            bufferD.append(lineD+"\n");
+                            lineD = readerD.readLine();
+                        }
+                        FileOutputStream fos = new FileOutputStream(file);
+                        String bufferstrD = bufferD.toString();
+                        fos.write(bufferstrD.getBytes());
+                        fos.close();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                    FileOutputStream fos = new FileOutputStream(file);
-                    String bufferstrD = bufferD.toString();
-                    fos.write(bufferstrD.getBytes());
-                    fos.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+                    readJsonFromDir();
                 }
             }
+        } else {
+            readJsonFromDir();
         }
 
         // contactList.json에서 id에 맞는 data 가져와서 adapter에 전달하기
 
-        readJsonFromDir();
 
         //버튼 뷰 추가
         Button addButton = (Button)view.findViewById(R.id.add);
@@ -255,13 +261,44 @@ public class ContactFrag extends Fragment {
             buffer.append(line+"\n");
 
             String jsonData= buffer.toString();
+            if(jsonData.contains(",\n]")){
+                jsonData = jsonData.replace(",\n]","\n]");
+            }
 
             //json 데이터가 []로 시작하는 배열일때..
-            JSONArray jsonArray= new JSONArray(jsonData);
+            JSONArray jsonArray = new JSONArray(jsonData);
 
-            for(int i=0; i<jsonArray.length();i++) {
-                JSONObject jo = jsonArray.getJSONObject(i);
+            // sort jsonArray
+            List<JSONObject> jsonObjectList = new ArrayList<JSONObject>();
+            for (int i = 0; i < jsonArray.length(); i++){
+                jsonObjectList.add(jsonArray.getJSONObject(i));
+            }
 
+            Collections.sort(jsonObjectList, new Comparator<JSONObject>() {
+                public int compare(JSONObject a, JSONObject b) {
+                    String valA = new String();
+                    String valB = new String();
+
+                    try{
+                        valA = (String) a.get("name");
+                        valB = (String) b.get("name");
+                    } catch (JSONException e){
+                        e.printStackTrace();
+                    }
+
+                    return valA.compareTo(valB);
+                }
+            });
+
+            JSONArray sortedJsonArray = new JSONArray();
+
+            for (int jsonI = 0; jsonI < jsonArray.length();jsonI++){
+                sortedJsonArray.put(jsonObjectList.get(jsonI));
+            }
+
+
+            for(int i=0; i<sortedJsonArray.length();i++) { // 안되면 -1 빼고 쉼표 빼기
+                JSONObject jo = sortedJsonArray.getJSONObject(i);
                 String name = jo.getString("name");
                 String dial = jo.getString("dial");
                 data.add(listViewAdapter.addItem(name, dial));
@@ -361,12 +398,13 @@ public class ContactFrag extends Fragment {
                     con.setDoInput(true);
                     con.setDoOutput(true);
                     con.setRequestProperty("Content-Type","application/json; charset=UTF-8");
-                    String json = "{\"facebookID\": \""+UserID+"\",\"contactList\": [{\"name\": \"test1\",\"phone_num\": \"11111111\"}]}";
+                    String json = "{\"facebookID\": \""+UserID+"\",\"contactList\": []}"; //{"name": "test1","phone_num": "11111111"}
                     OutputStream os = con.getOutputStream();
                     os.write(json.getBytes("UTF-8"));
                     os.close();
 
-                    con.connect(); // connect
+                    con.connect();// connect
+                    InputStream stream = con.getInputStream();// connect
 
                     return null;
 
